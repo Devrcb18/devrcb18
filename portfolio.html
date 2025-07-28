@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap');
+        
+        *,*:before,*:after {
+            box-sizing: inherit;
+            -webkit-user-select: inherit;
+            user-select: inherit;
+            -webkit-user-drag: inherit;
+            -webkit-tap-highlight-color: inherit;
+            backface-visibility: inherit
+        }
+
+        * {
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            line-height: 1;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            -webkit-tap-highlight-color: rgba(0,0,0,0)
+        }
+
+        main,canvas {
+            display: block
+        }
+
+        h1,h2,h3,h4,h5,h6 {
+            font-weight: inherit;
+            font-size: inherit
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none
+        }
+
+        ol,ul {
+            list-style: none
+        }
+
+        :root {
+            --c-bg: hsl(0, 0%, 90%);
+            --c-text: hsl(0, 0%, 10%);
+            --c-particle: rgba(0, 0, 0, 0.5);
+            --pad: max(20px, 4vmin);
+            --fs-text: 12px;
+            --vh: 1vh;
+            --vw: 1vw;
+        }
+
+        @media(prefers-color-scheme: dark) {
+            :root {
+                --c-bg: hsl(0, 0%, 5%);
+                --c-text: hsl(0, 0%, 95%);
+                --c-particle: rgba(255, 255, 255, 0.5);
+            }
+        }
+        html,body {
+            height: 100%;
+            overscroll-behavior: none
+        }
+
+        body {
+            background-color: var(--c-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-weight: 600;
+            font-size: var(--fs-text);
+            font-feature-settings: "palt";
+            font-synthesis: none;
+            -webkit-text-size-adjust: none;
+            text-size-adjust: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale
+        }
+
+        body.is-monospaced {
+            font-family: 'Space Mono', "Monaco", "Menlo", "Ubuntu Mono", monospace;
+        }
+
+        #Page {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--c-bg);
+            color: var(--c-text);
+            white-space: nowrap;
+            transition-property: background-color;
+            transition-duration: .9s;
+            transition-timing-function: cubic-bezier(0.1, 0.4, 0.2, 1)
+        }
+
+        #EnterView {
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            will-change: opacity;
+            background-color: var(--c-bg);
+            color: var(--c-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            column-gap: .5em;
+            font-size: 30px;
+            opacity: 1;
+            transition: opacity 1s ease;
+        }
+
+        #EnterView.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #EnterView ._t1 {
+            font-weight: 400
+        }
+
+        #EnterView ._t2 {
+            font-weight: 200
+        }
+
+        #Background {
+            position: fixed;
+            z-index: 1;
+            left: var(--pad);
+            right: var(--pad);
+            top: var(--pad);
+            bottom: var(--pad);
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        /* Particle Animation */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: var(--c-particle);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+            will-change: transform;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(20vw);
+                opacity: 0;
+            }
+        }
+
+        .mask {
+            position: fixed;
+            z-index: 3;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none
+        }
+
+        .mask_top,.mask_bottom {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: var(--pad);
+            background-color: var(--c-bg);
+            transition-property: background-color;
+            transition-duration: .9s;
+            transition-timing-function: cubic-bezier(0.1, 0.4, 0.2, 1);
+            opacity: .9
+        }
+
+        .mask_top {
+            top: 0
+        }
+
+        .mask_bottom {
+            bottom: 0
+        }
+
+        .frame {
+            position: fixed;
+            z-index: 10;
+            left: var(--pad);
+            right: var(--pad);
+            top: var(--pad);
+            bottom: var(--pad);
+            mix-blend-mode: difference;
+            pointer-events: none
+        }
+
+        .frame_line {
+            position: absolute;
+            background-color: var(--c-text);
+            opacity: .5
+        }
+
+        .frame_line-left {
+            left: 0;
+            top: 0;
+            width: 1px;
+            height: 100%
+        }
+
+        .frame_line-right {
+            right: 0;
+            top: 0;
+            width: 1px;
+            height: 100%
+        }
+
+        .frame_line-top {
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 1px
+        }
+
+        .frame_line-bottom {
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 1px
+        }
+
+        .theme {
+            position: fixed;
+            z-index: 10;
+            left: calc(var(--pad) - .15em);
+            bottom: var(--pad);
+            transform-origin: left bottom;
+            transform: rotate(-90deg);
+            white-space: nowrap;
+            mix-blend-mode: difference;
+            display: flex;
+            column-gap: 15px;
+            cursor: pointer
+        }
+
+        .theme_colors {
+            display: flex;
+            column-gap: 15px
+        }
+
+        .theme_btn {
+            display: flex;
+            column-gap: 3px;
+            font-weight: 400;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .theme_btn ._box::before {
+            content: "□"
+        }
+
+        .theme_btn.is-selected ._box::before {
+            content: "■"
+        }
+
+        #Copyright {
+            position: fixed;
+            z-index: 10;
+            left: var(--pad);
+            bottom: calc(var(--pad)*.5 - .5em);
+            font-size: 80%;
+            opacity: .5;
+            mix-blend-mode: difference
+        }
+
+        @media not all and (min-width: 640px) {
+            #Copyright {
+                display:none
+            }
+        }
+
+        .content {
+            position: fixed;
+            z-index: 2;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* Removed mix-blend-mode to fix visibility issues */
+        }
+
+        .content_inner {
+            position: relative;
+            min-height: 100%
+        }
+
+        .text-btn {
+            transition-property: opacity;
+            transition-duration: .4s;
+            transition-timing-function: cubic-bezier(0.1, 0.4, 0.2, 1);
+            cursor: pointer;
+        }
+
+        @media(hover: hover) {
+            .text-btn:hover {
+                opacity:.25
+            }
+        }
+
+        .siteHeader {
+            position: fixed;
+            z-index: 10;
+            left: calc(var(--pad)*2);
+            top: calc(var(--pad)*2);
+            mix-blend-mode: difference
+        }
+
+        .siteHeader_title {
+            margin: -0.1em 0 0 -0.04em;
+            font-weight: 200;
+            font-size: 30px
+        }
+
+        @media(min-width: 1280px) {
+            .siteHeader_title {
+                font-size:60px
+            }
+        }
+
+        .is-monospaced .siteHeader_title {
+            letter-spacing: -0.04em
+        }
+
+        .siteHeader_label {
+            margin-top: 5px;
+            font-weight: 400
+        }
+
+        .siteHeader_nav {
+            margin-top: 50px
+        }
+
+        .siteHeader_nav ol {
+            display: flex;
+            flex-direction: column;
+            row-gap: 15px
+        }
+
+        .siteHeader_nav ol li {
+            position: relative
+        }
+
+        .siteHeader_nav ol li ._dot {
+            position: absolute;
+            left: 0;
+            top: 2px;
+            font-size: 10px;
+            opacity: 0;
+            pointer-events: none;
+            transition-property: opacity;
+            transition-duration: .4s;
+            transition-timing-function: cubic-bezier(0.1, 0.4, 0.2, 1)
+        }
+
+        .siteHeader_nav ol li ._text {
+            position: relative;
+            transition-property: opacity;
+            transition-duration: .4s;
+            transition-timing-function: cubic-bezier(0.1, 0.4, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .siteHeader_nav ol li ._text::before {
+            content: "";
+            display: block;
+            position: absolute;
+            left: -5px;
+            top: -5px;
+            width: calc(100% + 10px);
+            height: calc(100% + 10px)
+        }
+
+        @media(hover: hover) {
+            .siteHeader_nav ol li ._text:hover {
+                opacity:.25
+            }
+        }
+
+        .siteHeader_nav ol li.is-selected {
+            pointer-events: none
+        }
+
+        .siteHeader_nav ol li.is-selected ._dot {
+            opacity: 1
+        }
+
+        .siteHeader_nav ol li.is-selected ._text {
+            opacity: 0
+        }
+
+        .page {
+            display: none;
+            width: 100%;
+            min-height: calc(var(--vh, 1vh)*100)
+        }
+
+        .page.is-active {
+            display: block;
+        }
+
+        .page.is-leaving {
+            position: absolute;
+            left: 0;
+            top: 0
+        }
+
+        .home {
+            position: absolute;
+            right: calc(var(--pad)*2);
+            bottom: calc(var(--pad)*2);
+            white-space: nowrap
+        }
+
+        .home_aboutme {
+            line-height: 1.5
+        }
+
+        .home_aboutme span {
+            display: block
+        }
+
+        /* Projects Page */
+        .project-container {
+            position: absolute;
+            top: calc(var(--pad)*2 + 96px);
+            bottom: calc(var(--pad)*2);
+            right: calc(var(--pad)*2);
+            left: calc(var(--pad)*2);
+            overflow: hidden;
+        }
+
+        .project-scroll {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .project-scroll::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
+        }
+
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            row-gap: 30px;
+            padding-right: 10px;
+        }
+
+        @media(min-width: 800px) {
+            .project-list {
+                row-gap:45px
+            }
+        }
+
+        .project-item {
+            text-align: right;
+            width: 100%;
+        }
+
+        .project-title {
+            font-weight: 200;
+            font-size: 6.5vw;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .project-title:hover {
+            opacity: 0.7;
+        }
+
+        @media(min-width: 800px) {
+            .project-title {
+                font-size:60px
+            }
+        }
+
+        .is-monospaced .project-title {
+            letter-spacing: -0.04em
+        }
+
+        .project-link {
+            display: inline-block;
+            font-size: 14px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+            margin-bottom: 5px;
+        }
+
+        .project-link:hover {
+            opacity: 1;
+        }
+
+        .project-info {
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        .project-info.mt-plus {
+            margin-top: 20px;
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: fixed;
+            right: calc(var(--pad) + 5px);
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0.5;
+            mix-blend-mode: difference;
+        }
+
+        .scroll-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--c-text);
+            border-radius: 50%;
+            margin: 4px 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .scroll-dot.active {
+            transform: scale(1.5);
+            opacity: 1;
+        }
+
+        .info {
+            position: absolute;
+            left: calc(var(--pad)*2);
+            bottom: calc(var(--pad)*2);
+            white-space: nowrap
+        }
+
+        @media(min-width: 1280px) {
+            .info {
+                position:relative;
+                left: auto;
+                bottom: auto;
+                height: calc(var(--vh, 1vh)*100)
+            }
+        }
+
+        @media(min-width: 1280px) {
+            .info_item {
+                position:absolute
+            }
+        }
+
+        .info_item+.info_item {
+            margin-top: 50px
+        }
+
+        @media(min-width: 1280px) {
+            .info_item+.info_item {
+                margin-top:0
+            }
+        }
+
+        @media(min-width: 1280px) {
+            .info_item-1 {
+                left:55%;
+                top: calc(50% - 19px)
+            }
+        }
+
+        @media(min-width: 1280px) {
+            .info_item-2 {
+                right:calc(var(--pad)*2);
+                top: calc(var(--pad)*2)
+            }
+        }
+
+        @media(min-width: 1280px) {
+            .info_item-3 {
+                right:calc(var(--pad)*2);
+                bottom: calc(var(--pad)*2)
+            }
+        }
+
+        .info_content {
+            line-height: 1.5
+        }
+
+        .info_content .is-light {
+            font-weight: 400
+        }
+
+        .contact {
+            position: absolute;
+            right: calc(var(--pad)*2);
+            bottom: calc(var(--pad)*2);
+            white-space: nowrap
+        }
+
+        .contact_text {
+            display: block
+        }
+
+        .contact_text+.contact_text {
+            margin-top: 1em
+        }
+
+        .contact_text .jp {
+            font-family: "Neue Montreal","Hiragino Sans",Meiryo,sans-serif
+        }
+
+        /* Updated Social Links Section */
+        .social {
+            position: absolute;
+            top: calc(var(--pad)*2 + 96px);
+            right: calc(var(--pad)*2);
+            left: calc(var(--pad)*2);
+            bottom: calc(var(--pad)*2);
+            text-align: right;
+            white-space: nowrap;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .social_list {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            row-gap: 2em;
+        }
+
+        .social_item {
+            width: 100%;
+            text-align: right;
+        }
+
+        .social_title {
+            font-weight: 200;
+            font-size: 6.5vw;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+            color: var(--c-text); /* Ensure text color is set */
+        }
+
+        .social_title:hover {
+            opacity: 0.7;
+        }
+
+        .social_link {
+            display: inline-block;
+            margin-top: 1em;
+            font-size: 14px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+            color: var(--c-text); /* Ensure link color is set */
+        }
+
+        .social_link:hover {
+            opacity: 1;
+        }
+
+        @media(min-width: 800px) {
+            .social_title {
+                font-size:60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="EnterView">
+        <span class="_t1">Hello</span>
+        <span class="_t2">Visitor!</span>
+    </div>
+
+    <div id="Page">
+        <div id="Background">
+            <div class="particles" id="particles"></div>
+        </div>
+        
+        <div class="mask">
+            <div class="mask_top"></div>
+            <div class="mask_bottom"></div>
+        </div>
+
+        <div class="frame">
+            <div class="frame_line frame_line-left"></div>
+            <div class="frame_line frame_line-right"></div>
+            <div class="frame_line frame_line-top"></div>
+            <div class="frame_line frame_line-bottom"></div>
+        </div>
+
+        <div class="theme">
+            <div class="theme_colors">
+                <div class="theme_btn is-selected" data-theme="light">
+                    <span class="_box"></span>
+                    <span>Light</span>
+                </div>
+                <div class="theme_btn" data-theme="dark">
+                    <span class="_box"></span>
+                    <span>Dark</span>
+                </div>
+                <div class="theme_btn" data-theme="mono">
+                    <span class="_box"></span>
+                    <span>Mono</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="Copyright">© 2025 Devansh Shukla</div>
+
+        <header class="siteHeader">
+            <h1 class="siteHeader_title">Portfolio</h1>
+            <div class="siteHeader_label">Devansh Shukla</div>
+            <nav class="siteHeader_nav">
+                <ol>
+                    <li class="is-selected" data-page="home">
+                        <span class="_dot">•</span>
+                        <span class="_text text-btn">Home</span>
+                    </li>
+                    <li data-page="project">
+                        <span class="_dot">•</span>
+                        <span class="_text text-btn">Projects</span>
+                    </li>
+                    <li data-page="info">
+                        <span class="_dot">•</span>
+                        <span class="_text text-btn">Info</span>
+                    </li>
+                    <li data-page="contact">
+                        <span class="_dot">•</span>
+                        <span class="_text text-btn">Contact</span>
+                    </li>
+                    <li data-page="social">
+                        <span class="_dot">•</span>
+                        <span class="_text text-btn">Links</span>
+                    </li>
+                </ol>
+            </nav>
+        </header>
+
+        <div class="content">
+            <div class="content_inner">
+                <!-- Home Page -->
+                <div class="page is-active" id="page-home">
+                    <div class="home">
+                        <div class="home_aboutme">
+                            <span>Hello, I'm Devansh Shukla.</span>
+                            <span>Sophomore @IIIT Kalyani.</span>
+                            <span>B.Tech- Electronics and Communication(2028).</span>
+                            <span>Passionate about AI-Ml,Backend, Avionics and Robotics.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects Page -->
+                <div class="page" id="page-project">
+                    <div class="project-container">
+                        <div class="project-scroll" id="projectScroll">
+                            <div class="project-list">
+                                <div class="project-item">
+                                    <h4 class="project-title text-btn">Artificial Neural Networks from scratch</h4>
+                                    <a href="https://github.com/Devrcb18/Machine-Learning-Deep-Learning/blob/main/nueral-network-from-scratch.ipynb" target="_blank" class="project-link">
+                                        🔗ANN from Scratch for classification (GitHub)
+                                    </a>
+                                    <div class="project-info">July 2025</div>
+                                </div>
+                                <div class="project-item">
+                                    <h4 class="project-title text-btn">Convolutional Neural Networks from scratch</h4>
+                                    <a href="https://github.com/Devrcb18/Machine-Learning-Deep-Learning/blob/main/cnn-from-scratch-on-mnist-dataset.ipynb" target="_blank" class="project-link">
+                                        🔗CNN from Scratch on MNIST (GitHub)
+                                    </a>
+                                    <div class="project-info">July 2025</div>
+                                </div>
+                                <div class="project-item">
+                                    <h4 class="project-title text-btn">Detecting Resistor's Resistance</h4>
+                                    <a href="https://github.com/Devrcb18/resistor.project" target="_blank" class="project-link">
+                                        🔗Resistor Color Code Detector using OpenCV (GitHub)
+                                    </a>
+                                    <div class="project-info mt-plus">May 2025</div>
+                                </div>
+                                <div class="project-item">
+                                    <h4 class="project-title text-btn">Peter a virtual Assistent</h4>
+                                    <a href="https://github.com/Devrcb18/python_project/blob/main/on_air_peter.py" target="_blank" class="project-link">
+                                        🔗 Peter: A Minimal Python Voice Assistant
+                                    </a>
+                                    <div class="project-info">December 2024</div>
+                                </div>
+                                <div class="project-item">
+                                    <h4 class="project-title text-btn">Clicksense</h4>
+                                    <a href="https://github.com/Devrcb18/python_project/blob/main/clickbait_classification_model%20and%20analysis" target="_blank" class="project-link">
+                                        🔗 ClickSense: A Machine Learning Model for Clickbait Detection
+                                    </a>
+                                    <div class="project-info">April 2025</div>
+                                </div>
+                                <div class="project-item">
+                                    <h4 class="project-title text-btn">Legal_AI</h4>
+                                    <a href="https://github.com/Devrcb18/Machine-Learning-Deep-Learning/blob/main/gemma-legal-advisor-letter-writing-and-download.ipynb" target="_blank" class="project-link">
+                                        🔗 Gemma Legal Advisor: Letter Writing and Download 
+                                    </a>
+                                    <div class="project-info">July 2025</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="scroll-indicator" id="scrollIndicator">
+                            <div class="scroll-dot" data-index="0"></div>
+                            <div class="scroll-dot" data-index="1"></div>
+                            <div class="scroll-dot" data-index="2"></div>
+                            <div class="scroll-dot" data-index="3"></div>
+                            <div class="scroll-dot" data-index="4"></div>
+                            <div class="scroll-dot" data-index="5"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Page -->
+                <div class="page" id="page-info">
+                    <div class="info">
+                        <div class="info_item info_item-1">
+                            <div class="info_content">
+                                <span class="is-light">Experience </span><br>
+                                .Frequent contributor on Github and kaggle<br>
+                                .Core-member of Freescape(Open source community)<br>
+                                .Participant of various hackathons including both hardware and software tracks<br>
+                            </div>
+                        </div>
+                        <div class="info_item info_item-2">
+                            <div class="info_content">
+                                <span class="is-light">Skills</span><br>
+                                .Machine Learning<br>
+                                .Deep Learning<br>
+                                .Flask and Django<br>
+                                .Languages : python c c++<br>
+                                .Robotics and Automation<br>
+                                .Data analysis and Visualization<br>
+                            </div>
+                        </div>
+                        <div class="info_item info_item-3">
+                            <div class="info_content">
+                                <span class="is-light">Recognition</span><br>
+                                Runners up in Enigma Robo maze competition<br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Page -->
+                <div class="page" id="page-contact">
+                    <div class="contact">
+                        <a href="mailto:ece24127@iiitkalyani.ac.in" class="contact_text text-btn">ece24127@iiitkalyani.ac.in</a>
+                        <a href="tel:9450508006" class="contact_text text-btn">9450508006</a>
+                        <span class="contact_text">
+                            <span class="jp">Available for new projects</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Social Links Page -->
+                <div class="page" id="page-social">
+                    <div class="social">
+                        <div class="social_list">
+                            <div class="social_item">
+                                <h4 class="social_title text-btn"></h4>
+                                <a href="https://github.com/Devrcb18" target="_blank" class="social_link">
+                                   -> GitHub
+                                </a>
+                            </div>
+                            <div class="social_item">
+                                <h4 class="social_title text-btn"></h4>
+                                <a href="https://www.kaggle.com/devanshshukla123" target="_blank" class="social_link">
+                                   -> Kaggle
+                                </a>
+                            </div>
+                            <div class="social_item">
+                                <h4 class="social_title text-btn"></h4>
+                                <a href="https://codeforces.com/profile/devanshc.shukla" target="_blank" class="social_link">
+                                    -> Codeforces
+                                </a>
+                            </div>
+                            <div class="social_item">
+                                <h4 class="social_title text-btn"></h4>
+                                <a href="https://www.instagram.com/devrcb18/" target="_blank" class="social_link">
+                                    ->Instagram
+                                </a>
+                            </div>
+                            <div class="social_item">
+                                <h4 class="social_title text-btn"></h4>
+                                <a href="https://drive.google.com/file/d/1FPLZP_ypSvzqgHhTURjugGtfazQRdax7/view?usp=sharing" target="_blank" class="social_link">
+                                    ->Resume
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 100; // Increased number of particles
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Random size (larger particles)
+                const size = Math.random() * 5 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random opacity
+                particle.style.opacity = Math.random() * 0.7 + 0.3;
+                
+                // Random animation duration and delay
+                const duration = Math.random() * 25 + 15;
+                const delay = Math.random() * -30;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Projects scroll indicator
+        function setupScrollIndicator() {
+            const scrollContainer = document.getElementById('projectScroll');
+            const dots = document.querySelectorAll('.scroll-dot');
+            const projectItems = document.querySelectorAll('.project-item');
+            
+            if (projectItems.length === 0) return;
+            
+            const itemHeight = projectItems[0].offsetHeight + 
+                              parseInt(window.getComputedStyle(projectItems[0]).marginBottom);
+            
+            scrollContainer.addEventListener('scroll', () => {
+                const scrollPosition = scrollContainer.scrollTop;
+                const activeIndex = Math.round(scrollPosition / itemHeight);
+                
+                dots.forEach((dot, index) => {
+                    if (index === activeIndex) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
+            });
+            
+            // Click on dots to scroll to projects
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    const index = parseInt(dot.getAttribute('data-index'));
+                    scrollContainer.scrollTo({
+                        top: index * itemHeight,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        }
+
+        // Page navigation
+        const navItems = document.querySelectorAll('.siteHeader_nav li');
+        const pages = document.querySelectorAll('.page');
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const targetPage = item.dataset.page;
+                
+                // Update navigation
+                navItems.forEach(nav => nav.classList.remove('is-selected'));
+                item.classList.add('is-selected');
+                
+                // Update pages
+                pages.forEach(page => page.classList.remove('is-active'));
+                document.getElementById(`page-${targetPage}`).classList.add('is-active');
+            });
+        });
+
+        // Theme switcher
+        const themeButtons = document.querySelectorAll('.theme_btn');
+        const body = document.body;
+        const page = document.getElementById('Page');
+
+        themeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const theme = btn.dataset.theme;
+                
+                // Update button states
+                themeButtons.forEach(b => b.classList.remove('is-selected'));
+                btn.classList.add('is-selected');
+                
+                // Apply theme
+                body.classList.remove('is-monospaced');
+                
+                if (theme === 'dark') {
+                    document.documentElement.style.setProperty('--c-bg', 'hsl(0, 0%, 5%)');
+                    document.documentElement.style.setProperty('--c-text', 'hsl(0, 0%, 95%)');
+                    document.documentElement.style.setProperty('--c-particle', 'rgba(255, 255, 255, 0.5)');
+                } else if (theme === 'light') {
+                    document.documentElement.style.setProperty('--c-bg', 'hsl(0, 0%, 90%)');
+                    document.documentElement.style.setProperty('--c-text', 'hsl(0, 0%, 10%)');
+                    document.documentElement.style.setProperty('--c-particle', 'rgba(0, 0, 0, 0.5)');
+                } else if (theme === 'mono') {
+                    body.classList.add('is-monospaced');
+                    document.documentElement.style.setProperty('--c-bg', 'hsl(0, 0%, 15%)');
+                    document.documentElement.style.setProperty('--c-text', 'hsl(120, 100%, 80%)');
+                    document.documentElement.style.setProperty('--c-particle', 'rgba(120, 255, 120, 0.5)');
+                }
+            });
+        });
+
+        // Enter view animation
+        const enterView = document.getElementById('EnterView');
+        
+        setTimeout(() => {
+            enterView.classList.add('hidden');
+        }, 2000);
+
+        // Responsive viewport height
+        function setVH() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
+        setVH();
+        window.addEventListener('resize', setVH);
+
+        // Initialize particles and scroll indicator
+        createParticles();
+        setupScrollIndicator();
+    </script>
+</body>
+</html>
